@@ -31,3 +31,4 @@ Implement reward tracking
 
 Enhance user interface
 
+This project is licensed under the [MIT License](LICENSE).
