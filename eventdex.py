@@ -1,4 +1,4 @@
-import sys
+from event_manager import EventManager
 import os
 import pandas as pd
 from ui_design import Design
@@ -11,11 +11,15 @@ from PyQt6.QtCore import Qt, QDate
 
 
 class EventDexApp(QWidget):
-    VERSION = "v0.1 MVP"
+    VERSION = "v0.2"
     AUTHOR = "Synel96"
-
+    EVENTS = [
+            "Max Monday", "Spotlight Hour", "Raid Hour",
+            "Community Day", "Raid Day", "Go Fest", "Go Tour", "Other"
+        ]
     def __init__(self):
         super().__init__()
+        self.event_manager = EventManager()
         self.setup_window()
         self.setup_ui()
 
@@ -40,10 +44,7 @@ class EventDexApp(QWidget):
         self.style_input_widget(self.date_input)
 
         self.event_type_input = QComboBox()
-        self.event_type_input.addItems([
-            "Max Monday", "Spotlight Hour", "Raid Hour",
-            "Community Day", "Raid Day", "Go Fest", "Go Tour", "Other"
-        ])
+        self.event_type_input.addItems(self.EVENTS)
         self.style_input_widget(self.event_type_input)
 
         self.attendee_input = QSpinBox()
@@ -116,28 +117,16 @@ class EventDexApp(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         return layout
 
+    
     def save_to_excel(self):
-        filename = "events.xlsx"
-        data = {
-            "Date": [self.date_input.date().toString("yyyy-MM-dd")],
-            "Event Type": [self.event_type_input.currentText()],
-            "Attendees": [self.attendee_input.value()],
-            "Host": [self.host_input.text()]
-        }
-
-        if os.path.exists(filename):
-            try:
-                df = pd.read_excel(filename)
-                df_new = pd.DataFrame(data)
-                df = pd.concat([df, df_new], ignore_index=True)
-            except Exception as e:
-                self.show_info_message("Error", f"Failed to read existing Excel file:\n{e}")
-                return
-        else:
-            df = pd.DataFrame(data)
+        date_str = self.date_input.date().toString("yyyy-MM-dd")
+        event_type = self.event_type_input.currentText()
+        attendees = self.attendee_input.value()
+        host = self.host_input.text()
 
         try:
-            df.to_excel(filename, index=False)
+            self.event_manager.save_event(date_str, event_type, attendees, host)
             self.show_info_message("Saved", "Event saved successfully!")
-        except Exception as e:
-            self.show_info_message("Error", f"Failed to save Excel file")
+        except RuntimeError as e:
+            self.show_info_message("Error", str(e))
+    
