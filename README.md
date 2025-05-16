@@ -9,6 +9,8 @@ This is my first GUI project to help organize Pokémon Go community events by sa
 Overview
 As a former Pokémon Go community ambassador, I organized player events with rewards. This GUI simplifies the administrative work by allowing you to save basic event details.
 
+![Saved evnets in excel](Images/Event_Dex.png)
+
 Features
 Save event information (date, location, type, etc.)
 
